@@ -166,7 +166,8 @@ bool SimpleEQ3AudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* SimpleEQ3AudioProcessor::createEditor()
 {
-    return new SimpleEQ3AudioProcessorEditor (*this);
+    //return new SimpleEQ3AudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -182,6 +183,41 @@ void SimpleEQ3AudioProcessor::setStateInformation (const void* data, int sizeInB
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
+
+juce::AudioProcessorValueTreeState::ParameterLayout 
+SimpleEQ3AudioProcessor::createParameterLayout() {
+
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    layout.add(std::make_unique<juce::AudioParameterFloat>("LowCut freq", "LowCut freq", 
+        juce::NormalisableRange<float>(20.f, 20000.f, 1., 0.45f), 20.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HighCut freq", "HighCut freq",
+        juce::NormalisableRange<float>(20.f, 20000.f, 1., 1.f), 20000.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak freq", "Peak freq",
+        juce::NormalisableRange<float>(20.f, 20000.f, 1., 1.f), 750.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak gain", "Peak gain",
+        juce::NormalisableRange<float>(-24.f, 24.f, 0.5, 1.f), 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
+        juce::NormalisableRange<float>(0.1f, 10.f, 0.05, 1.f), 0.71f));
+
+    juce::StringArray stringArray;
+    for (int i = 0; i < 4; i++) {
+        juce::String str;
+        str << (i + 1) * 12;
+        str << " dB/Oct";
+        stringArray.add(str);
+    }
+
+    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut slope", "LowCut slope", stringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut slope", "HighCut slope", stringArray, 0));
+
+    return layout;
+
+}
+
 
 //==============================================================================
 // This creates new instances of the plugin..
