@@ -59,6 +59,13 @@ public:
         nullptr, "Parameters", createParameterLayout()};
 
 private:
+
+    using Filter = juce::dsp::IIR::Filter<float>;  // declaring an alias for readability
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;  // In order to go up to -48dB for filter slope, we need to chain filters
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;  // Full chain allowing us to chain the HP, peak and LP filters
+
+    MonoChain leftChain, rightChain;  // We need two instances if we want to do stereo processing
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQ3AudioProcessor)
 };
